@@ -1,10 +1,10 @@
-CoinLookup to lookup {slot value|currency}
-CoinLookup to search {slot value|currency}
-CoinLookup to find {slot value|currency}
-CoinLookup for the price of {slot value|currency}
-CoinLookup for the current price of {slot value|currency}
-CoinLookup about {slot value|currency}
-CoinLookup for {slot value|currency}
+CoinLookup to lookup {currency}
+CoinLookup to search {currency}
+CoinLookup to find {currency}
+CoinLookup for the price of {currency}
+CoinLookup for the current price of {currency}
+CoinLookup about {currency}
+CoinLookup for {currency}
 
 CoinOverview for an overview
 CoinOverview for all stats
