@@ -1,0 +1,16 @@
+{
+  "intents": [
+    {
+      "intent": "CoinLookup",
+      "slots": [
+        {
+          "name": "currency",
+          "type": "SUPPORTED_CURRENCIES"
+        }
+      ]
+    },
+    {
+      "intent": "CoinOverview"
+    }
+  ]
+}
