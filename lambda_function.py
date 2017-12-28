@@ -63,7 +63,9 @@ def acct_overview(event):
     s = 's' if len(a['data']) > 1 else ''
     resp += 'I found {} account{}. '.format(len(a['data']), s)
     for d in a['data']:
-        resp += '{} contains {}. '.format(d['name'], d['balance']['amount'])
+        resp += '{} contains {} {}. '.format(
+            d['name'], d['balance']['amount'], d['balance']['currency']
+        )
 
     alexa = alexa_response(
         {},
@@ -74,11 +76,19 @@ def acct_overview(event):
     return alexa
 
 
-def coin_overview(event):
+def coin_overview():
+    btc = lookup_coinbase('BTC')
+    bch = lookup_coinbase('BCH')
+    eth = lookup_coinbase('ETH')
+    ltc = lookup_coinbase('LTC')
+    speech = ('Bitcoin is worth {} dollars, '
+              'Bitcoin Cash is worth {} dollars, '
+              'Ethereum is worth {} dollars and '
+              'Litecoin is worth {} dollars.').format(btc, bch, eth, ltc)
     alexa = alexa_response(
         {},
         build_speech_response(
-            'WIP', 'Overview not yet finished.', None, True
+            'Coin Overview', speech, None, True
         )
     )
     return alexa
@@ -86,9 +96,7 @@ def coin_overview(event):
 
 def lookup_coinbase(currency_code):
     url = 'https://api.coinbase.com/v2/exchange-rates'
-    params = {
-        'currency': currency_code,
-    }
+    params = {'currency': currency_code}
     r = requests.get(url, params=params, timeout=3)
     d = r.json()
     return d['data']['rates']['USD']
@@ -126,7 +134,7 @@ def lambda_handler(event, context):
         if intent == 'CoinLookup':
             return coin_lookup(event)
         elif intent == 'CoinOverview':
-            return coin_overview(event)
+            return coin_overview()
         elif intent == 'AccountOverview':
             return acct_overview(event)
         else:
