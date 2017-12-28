@@ -40,6 +40,50 @@ def alexa_response(session_attributes, speech_response):
     }
 
 
+def alexa_error(error='Unknown error, please try something else', title='UE'):
+    alexa = alexa_response(
+        {}, build_speech_response(title, error, None, True)
+    )
+    return alexa
+
+
+def get_accounts(token):
+    url = 'https://api.coinbase.com/v2/accounts'
+    headers = {
+        'Authorization': 'Bearer {}'.format(token)
+    }
+    r = requests.get(url, headers=headers)
+    j = r.json()
+    return j
+
+
+def acct_overview(event):
+    resp = ''
+    a = get_accounts(event['session']['user']['accessToken'])
+    s = 's' if len(a['data']) > 1 else ''
+    resp += 'I found {} account{}. '.format(len(a['data']), s)
+    for d in a['data']:
+        resp += '{} contains {}. '.format(d['name'], d['balance']['amount'])
+
+    alexa = alexa_response(
+        {},
+        build_speech_response(
+            'Accounts Overview', resp, None, True
+        )
+    )
+    return alexa
+
+
+def coin_overview(event):
+    alexa = alexa_response(
+        {},
+        build_speech_response(
+            'WIP', 'Overview not yet finished.', None, True
+        )
+    )
+    return alexa
+
+
 def lookup_coinbase(currency_code):
     url = 'https://api.coinbase.com/v2/exchange-rates'
     params = {
@@ -50,45 +94,45 @@ def lookup_coinbase(currency_code):
     return d['data']['rates']['USD']
 
 
-def lambda_handler(event, context):
-    print('event: {}'.format(event))
-
+def coin_lookup(event):
     try:
-        if event['request']['intent']['name'] == 'CoinLookup':
-            try:
-                value = event['request']['intent']['slots']['currency']['value']
-                value = value.lower().replace('define', '').strip()
-                value = value.lower().replace('lookup', '').strip()
-                value = value.lower().replace('look up', '').strip()
-                value = value.lower().replace('search', '').strip()
-                value = value.lower().replace('find', '').strip()
-                print('value: {}'.format(value))
-            except Exception as error:
-                print('error: {}'.format(error))
-                alexa = alexa_response(
-                    {}, build_speech_response('Error', TXT_UNKNOWN, None, True)
-                )
-                return alexa
-            definition = lookup_coinbase(KEYS[value])
-            speech = 'The current price of {} is {} dollars'.format(
-                value, definition
-            )
-            alexa = alexa_response(
-                {}, build_speech_response('Price', speech, None, True)
-            )
-            return alexa
-        elif event['request']['intent']['name'] == 'CoinOverview':
-            alexa = alexa_response(
-                {},
-                build_speech_response('WIP', 'This section is not finished.', None, True)
-            )
-            return alexa
-        else:
-            raise ValueError('Unknown Intent')
+        value = event['request']['intent']['slots']['currency']['value']
+        value = value.lower().replace('define', '').strip()
+        value = value.lower().replace('lookup', '').strip()
+        value = value.lower().replace('look up', '').strip()
+        value = value.lower().replace('search', '').strip()
+        value = value.lower().replace('find', '').strip()
+        print('value: {}'.format(value))
     except Exception as error:
         print('error: {}'.format(error))
         alexa = alexa_response(
-            {},
-            build_speech_response('Error', TXT_ERROR.format(value), None, True)
+            {}, build_speech_response('Error', TXT_UNKNOWN, None, True)
         )
         return alexa
+    definition = lookup_coinbase(KEYS[value])
+    speech = 'The current price of {} is {} dollars'.format(
+        value, definition
+    )
+    alexa = alexa_response(
+        {}, build_speech_response('Price', speech, None, True)
+    )
+    return alexa
+
+
+def lambda_handler(event, context):
+    print('event: {}'.format(event))
+    try:
+        intent = event['request']['intent']['name']
+        if intent == 'CoinLookup':
+            return coin_lookup(event)
+        elif intent == 'CoinOverview':
+            return coin_overview(event)
+        elif intent == 'AccountOverview':
+            return acct_overview(event)
+        else:
+            raise ValueError('Unknown Intent')
+    except ValueError:
+        return alexa_error()
+    except Exception as error:
+        print('error: {}'.format(error))
+        return alexa_error()

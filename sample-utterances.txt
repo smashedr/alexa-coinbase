@@ -6,8 +6,23 @@ CoinLookup for the current price of {currency}
 CoinLookup about {currency}
 CoinLookup for {currency}
 
-CoinOverview for an overview
-CoinOverview for all stats
-CoinOverview for all statistics
+CoinOverview price overview
+CoinOverview price stats
+CoinOverview price info
+CoinOverview price information
 CoinOverview for all prices
-CoinOverview for prices
+CoinOverview for crypto prices
+CoinOverview for cryptocurrency prices
+
+AccountOverview accounts overview
+AccountOverview for accounts overview
+AccountOverview for an accounts overview
+AccountOverview account overview
+AccountOverview for account overview
+AccountOverview for an account overview
+AccountOverview account status
+AccountOverview for account status
+AccountOverview accounts status
+AccountOverview for accounts status
+AccountOverview account status
+AccountOverview accounts status
